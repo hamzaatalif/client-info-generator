@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Info Generator - Better Conversions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #64748b;
+            --border: #334155;
+            --border-hover: #475569;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 24px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 32px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 13px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .auto-save-indicator {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .auto-save-indicator.saving {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .auto-save-indicator.saved {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border-hover);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-add {
+            background: var(--bg-secondary);
+            color: var(--primary);
+            border-color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .label-hint {
+            font-weight: 400;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        input[type="date"],
+        input[type="number"],
+        input[type="color"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="color"] {
+            height: 40px;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        .color-input-group {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 8px;
+        }
+
+        .store-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .store-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .store-number {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .store-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .output-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-top: 32px;
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .output-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        pre {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+            font-style: normal;
+        }
+
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .templates-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .templates-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .template-item {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: var(--bg-primary);
+        }
+
+        .template-item:hover {
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .template-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .template-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .row, .row-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            body {
+                padding: 12px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .output-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .store-actions {
+                flex-direction: column;
+            }
+        }
+
+        .field-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .field-group-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="header-title">
+                    <h1>Client Info Generator</h1>
+                    <p>Better Conversions - Shopify Development</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <span id="themeIcon">Dark</span>
+                    </button>
+                    <div class="auto-save-indicator" id="autoSaveStatus">
+                        <span id="saveStatus">Saved</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="toolbar">
+                <button class="btn" onclick="showTemplates()">Load Template</button>
+                <button class="btn" onclick="loadFromFile()">Import JSON</button>
+                <button class="btn" onclick="exportData()">Export Progress</button>
+                <button class="btn" onclick="importData()">Import Progress</button>
+                <button class="btn" onclick="clearForm()">Clear All</button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                JSON generated successfully! Scroll down to copy.
+            </div>
+
+            <form id="clientForm">
+                <!-- Basic Information -->
+                <div class="section">
+                    <h2 class="section-title">Basic Information</h2>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Client/Business Name *</label>
+                            <input type="text" id="clientName" required placeholder="e.g., Luxe Boutique">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Brand Name <span class="label-hint">(optional, if different)</span></label>
+                            <input type="text" id="brandName" placeholder="e.g., LUXE">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Contact Email <span class="label-hint">(optional)</span></label>
+                            <input type="email" id="contactEmail" placeholder="client@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Company Website <span class="label-hint">(optional)</span></label>
+                            <input type="url" id="companyWebsite" placeholder="https://example.com">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Industry/Niche <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="industry" placeholder="e.g., Fashion, Beauty, Electronics">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fiverr Order ID <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="fiverOrderId" placeholder="e.g., FO24110812345">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Timezone</label>
+                            <input type="text" id="timezone" list="timezones" placeholder="EST, PST, GMT...">
+                            <datalist id="timezones">
+                                <option value="EST">
+                                <option value="CST">
+                                <option value="MST">
+                                <option value="PST">
+                                <option value="GMT">
+                                <option value="CET">
+                                <option value="IST">
+                                <option value="AEST">
+                                <option value="PKT">
+                            </datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Preferred Working Hours <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="workingHours" placeholder="e.g., 9 AM - 5 PM EST">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="startDate">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option value="active">Active</option>
+                                <option value="paused">Paused</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project Budget/Value <span class="label-hint">(optional)</span></label>
+                        <input type="text" id="budget" placeholder="e.g., $500 - $1000, Mid-range">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes <span class="label-hint">(preferences, personality, observations)</span></label>
+                        <textarea id="notes" placeholder="e.g., Detail-oriented. Prefers video explanations. Fast to respond."></textarea>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="section">
+                    <h2 class="section-title">Contact Information</h2>
+                    <p class="section-subtitle">Add additional contact methods for this client</p>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>WhatsApp Number <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="whatsapp" placeholder="+1 234 567 8900">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Slack Channel/Workspace <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="slack" placeholder="workspace-name or #channel">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Discord Username <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="discord" placeholder="username#1234">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number <span class="label-hint">(optional)</span></label>
+                            <input type="text" id="phone" placeholder="+1 234 567 8900">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Other Contact Methods <span class="label-hint">(optional)</span></label>
+                        <textarea id="otherContact" rows="3" placeholder="e.g., Telegram: @username, Skype: username"></textarea>
+                    </div>
+                </div>
+
+                <!-- Communication Preferences -->
+                <div class="section">
+                    <h2 class="section-title">Communication Preferences</h2>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Primary Platform</label>
+                            <select id="platform">
+                                <option value="fiverr">Fiverr</option>
+                                <option value="email">Email</option>
+                                <option value="slack">Slack</option>
+                                <option value="discord">Discord</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Expected Response Time</label>
+                            <select id="responseTime">
+                                <option value="within 6 hours">Within 6 hours</option>
+                                <option value="within 12 hours">Within 12 hours</option>
+                                <option value="within 24 hours">Within 24 hours</option>
+                                <option value="24-48 hours">24-48 hours</option>
+                                <option value="flexible">Flexible</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="prefersVideos" checked>
+                        <label for="prefersVideos">Prefers video walkthroughs</label>
+                    </div>
+                </div>
+
+                <!-- Store Information -->
+                <div class="section">
+                    <h2 class="section-title">Store Information</h2>
+                    <p class="section-subtitle">Add all stores this client owns</p>
+                    
+                    <button type="button" class="btn btn-add" onclick="addStore()">Add Store</button>
+                    
+                    <div id="storesContainer"></div>
+                </div>
+
+                <!-- Generate Button -->
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                    Generate Client Info JSON
+                </button>
+            </form>
+
+            <!-- Output -->
+            <div class="output-section" id="outputSection">
+                <div class="output-header">
+                    <span class="output-title">Generated JSON</span>
+                    <div class="output-actions">
+                        <button type="button" class="btn" onclick="copyToClipboard()">
+                            <span id="copyText">Copy</span>
+                        </button>
+                        <button type="button" class="btn" onclick="downloadJSON()">
+                            Download
+                        </button>
+                    </div>
+                </div>
+                <pre id="jsonOutput"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div class="templates-modal" id="templatesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Choose Template</h2>
+                <button class="modal-close" onclick="hideTemplates()">×</button>
+            </div>
+            <div id="templatesList"></div>
+        </div>
+    </div>
+
+    <!-- Hidden file inputs -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+    <input type="file" id="progressInput" accept=".json" style="display: none;" onchange="handleProgressImport(event)">
+
+    <script>
+        // Common Shopify apps for autocomplete
+        const commonApps = ['Klaviyo', 'Yotpo', 'Judge.me', 'Loox', 'ReCharge', 'Gorgias', 'Smile.io', 'Privy', 'Okendo', 'Stamped.io', 'Omnisend', 'Attentive', 'Postscript', 'Rebuy'];
+        
+        // Common fonts for autocomplete
+        const commonFonts = ['Inter', 'Montserrat', 'Open Sans', 'Roboto', 'Poppins', 'Lato', 'Raleway', 'Playfair Display', 'Bebas Neue', 'Oswald', 'Work Sans', 'DM Sans', 'Plus Jakarta Sans', 'Manrope'];
+
+        // Templates
+        const templates = [
+            {
+                name: 'Standard DTC Brand',
+                description: 'Typical direct-to-consumer brand setup',
+                data: {
+                    apps: 'Klaviyo, Yotpo, Judge.me',
+                    fonts: { heading: 'Montserrat', body: 'Open Sans', accent: '' },
+                    colors: { brand: '#2563eb', accent: '#dc2626', background: '#ffffff', text: '#000000' }
+                }
+            },
+            {
+                name: 'Fashion/Apparel',
+                description: 'Fashion brand with elegant styling',
+                data: {
+                    apps: 'Klaviyo, Yotpo, Loox',
+                    fonts: { heading: 'Playfair Display', body: 'Lato', accent: 'Montserrat' },
+                    colors: { brand: '#000000', accent: '#f59e0b', background: '#fafafa', text: '#1a1a1a' }
+                }
+            },
+            {
+                name: 'Subscription Brand',
+                description: 'Subscription-based business',
+                data: {
+                    apps: 'Klaviyo, ReCharge, Gorgias, Smile.io',
+                    fonts: { heading: 'Inter', body: 'Inter', accent: '' },
+                    colors: { brand: '#10b981', accent: '#3b82f6', background: '#ffffff', text: '#111827' }
+                }
+            },
+            {
+                name: 'Minimal Modern',
+                description: 'Clean, minimal design',
+                data: {
+                    apps: 'Klaviyo, Gorgias',
+                    fonts: { heading: 'DM Sans', body: 'Inter', accent: '' },
+                    colors: { brand: '#0f172a', accent: '#3b82f6', background: '#ffffff', text: '#334155' }
+                }
+            }
+        ];
+
+        // Initialize
+        document.getElementById('startDate').valueAsDate = new Date();
+        let storeCount = 0;
+        let autoSaveTimer;
+
+        // Load saved data on startup
+        window.addEventListener('load', () => {
+            loadAutoSaved();
+            addStore(); // Add first store by default
+        });
+
+        // Auto-save functionality
+        document.getElementById('clientForm').addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            showAutoSaveStatus('saving');
+            autoSaveTimer = setTimeout(() => {
+                autoSaveFormData();
+                showAutoSaveStatus('saved');
+            }, 1000);
+        });
+
+        function showAutoSaveStatus(status) {
+            const indicator = document.getElementById('autoSaveStatus');
+            const statusText = document.getElementById('saveStatus');
+            indicator.className = 'auto-save-indicator ' + status;
+            statusText.textContent = status === 'saving' ? 'Saving...' : 'Saved';
+        }
+
+        function autoSaveFormData() {
+            const formData = {
+                clientName: document.getElementById('clientName').value,
+                brandName: document.getElementById('brandName').value,
+                fiverOrderId: document.getElementById('fiverOrderId').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                companyWebsite: document.getElementById('companyWebsite').value,
+                industry: document.getElementById('industry').value,
+                timezone: document.getElementById('timezone').value,
+                workingHours: document.getElementById('workingHours').value,
+                startDate: document.getElementById('startDate').value,
+                status: document.getElementById('status').value,
+                budget: document.getElementById('budget').value,
+                notes: document.getElementById('notes').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                slack: document.getElementById('slack').value,
+                discord: document.getElementById('discord').value,
+                phone: document.getElementById('phone').value,
+                otherContact: document.getElementById('otherContact').value,
+                platform: document.getElementById('platform').value,
+                responseTime: document.getElementById('responseTime').value,
+                prefersVideos: document.getElementById('prefersVideos').checked,
+                stores: getStoresData()
+            };
+            localStorage.setItem('clientFormData', JSON.stringify(formData));
+        }
+
+        function loadAutoSaved() {
+            const saved = localStorage.getItem('clientFormData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('clientName').value = data.clientName || '';
+                document.getElementById('brandName').value = data.brandName || '';
+                document.getElementById('fiverOrderId').value = data.fiverOrderId || '';
+                document.getElementById('contactEmail').value = data.contactEmail || '';
+                document.getElementById('companyWebsite').value = data.companyWebsite || '';
+                document.getElementById('industry').value = data.industry || '';
+                document.getElementById('timezone').value = data.timezone || 'EST';
+                document.getElementById('workingHours').value = data.workingHours || '';
+                document.getElementById('startDate').value = data.startDate || '';
+                document.getElementById('status').value = data.status || 'active';
+                document.getElementById('budget').value = data.budget || '';
+                document.getElementById('notes').value = data.notes || '';
+                document.getElementById('whatsapp').value = data.whatsapp || '';
+                document.getElementById('slack').value = data.slack || '';
+                document.getElementById('discord').value = data.discord || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('otherContact').value = data.otherContact || '';
+                document.getElementById('platform').value = data.platform || 'fiverr';
+                document.getElementById('responseTime').value = data.responseTime || 'within 12 hours';
+                document.getElementById('prefersVideos').checked = data.prefersVideos !== false;
+                
+                // Load stores
+                if (data.stores && data.stores.length > 0) {
+                    data.stores.forEach((store, index) => {
+                        if (index === 0) {
+                            populateStore(1, store);
+                        } else {
+                            addStore();
+                            populateStore(storeCount, store);
+                        }
+                    });
+                }
+            }
+        }
+
+        function populateStore(storeNum, data) {
+            const store = document.getElementById(`store-${storeNum}`);
+            if (!store) return;
+            
+            store.querySelector('.store-url').value = data.storeUrl || '';
+            store.querySelector('.store-launch-date').value = data.launchDate || '';
+            store.querySelector('.store-target-market').value = data.targetMarket || '';
+            store.querySelector('.store-product-count').value = data.productCount || '';
+            store.querySelector('.store-monthly-traffic').value = data.monthlyTraffic || '';
+            store.querySelector('.store-theme-id').value = data.themeId || '';
+            store.querySelector('.store-theme-name').value = data.themeName || '';
+            store.querySelector('.store-theme-version').value = data.themeVersion || '';
+            store.querySelector('.store-brand-color').value = data.brandColor || '';
+            store.querySelector('.store-accent-color').value = data.accentColor || '';
+            store.querySelector('.store-background-color').value = data.backgroundColor || '';
+            store.querySelector('.store-text-color').value = data.textColor || '';
+            store.querySelector('.store-border-color').value = data.borderColor || '';
+            store.querySelector('.store-heading-font').value = data.headingFont || '';
+            store.querySelector('.store-body-font').value = data.bodyFont || '';
+            store.querySelector('.store-accent-font').value = data.accentFont || '';
+            store.querySelector('.store-apps').value = data.apps || '';
+            store.querySelector('.store-collab-code').value = data.collabCode || '';
+            store.querySelector('.store-dev-store').checked = data.devStore || false;
+            store.querySelector('.store-access').value = data.access || 'full';
+        }
+
+        function getStoresData() {
+            const stores = [];
+            document.querySelectorAll('.store-item').forEach(store => {
+                stores.push({
+                    storeUrl: store.querySelector('.store-url').value,
+                    launchDate: store.querySelector('.store-launch-date').value,
+                    targetMarket: store.querySelector('.store-target-market').value,
+                    productCount: store.querySelector('.store-product-count').value,
+                    monthlyTraffic: store.querySelector('.store-monthly-traffic').value,
+                    themeId: store.querySelector('.store-theme-id').value,
+                    themeName: store.querySelector('.store-theme-name').value,
+                    themeVersion: store.querySelector('.store-theme-version').value,
+                    brandColor: store.querySelector('.store-brand-color').value,
+                    accentColor: store.querySelector('.store-accent-color').value,
+                    backgroundColor: store.querySelector('.store-background-color').value,
+                    textColor: store.querySelector('.store-text-color').value,
+                    borderColor: store.querySelector('.store-border-color').value,
+                    headingFont: store.querySelector('.store-heading-font').value,
+                    bodyFont: store.querySelector('.store-body-font').value,
+                    accentFont: store.querySelector('.store-accent-font').value,
+                    apps: store.querySelector('.store-apps').value,
+                    collabCode: store.querySelector('.store-collab-code').value,
+                    devStore: store.querySelector('.store-dev-store').checked,
+                    access: store.querySelector('.store-access').value
+                });
+            });
+            return stores;
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? '' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            document.getElementById('themeIcon').textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+        }
+
+        function addStore() {
+            storeCount++;
+            const container = document.getElementById('storesContainer');
+            
+            const storeDiv = document.createElement('div');
+            storeDiv.className = 'store-item';
+            storeDiv.id = `store-${storeCount}`;
+            
+            storeDiv.innerHTML = `
+                <div class="store-item-header">
+                    <span class="store-number">Store #${storeCount}</span>
+                    <div class="store-actions">
+                        ${storeCount > 1 ? `<button type="button" class="btn" onclick="duplicateStore(${storeCount})">Duplicate</button>` : ''}
+                        <button type="button" class="btn btn-danger" onclick="removeStore(${storeCount})">Remove</button>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-group-title">Store Details</div>
+                    
+                    <div class="form-group">
+                        <label>Store URL *</label>
+                        <input type="text" class="store-url" required placeholder="storename.myshopify.com">
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Store Launch Date <span class="label-hint">(optional)</span></label>
+                            <input type="date" class="store-launch-date">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Target Market/Region <span class="label-hint">(optional)</span></label>
+                            <input type="text" class="store-target-market" placeholder="e.g., USA, UK, Global">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Product Count <span class="label-hint">(optional)</span></label>
+                            <input type="number" class="store-product-count" placeholder="e.g., 50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Monthly Traffic <span class="label-hint">(optional)</span></label>
+                            <input type="text" class="store-monthly-traffic" placeholder="e.g., 10K visitors/month">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-group-title">Theme Information</div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Theme ID *</label>
+                            <input type="text" class="store-theme-id" required placeholder="134567890">
+                            <p class="helper-text">Admin → Themes → Edit Code (check URL)</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Theme Name</label>
+                            <input type="text" class="store-theme-name" placeholder="Dawn, Debut, etc.">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Theme Version <span class="label-hint">(optional)</span></label>
+                        <input type="text" class="store-theme-version" placeholder="e.g., 5.0.0, 2.1.3">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-group-title">Brand Colors</div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Primary Brand Color</label>
+                            <div class="color-input-group">
+                                <input type="color" class="store-brand-color-picker" value="#2563eb">
+                                <input type="text" class="store-brand-color" placeholder="#2563eb">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="color-input-group">
+                                <input type="color" class="store-accent-color-picker" value="#dc2626">
+                                <input type="text" class="store-accent-color" placeholder="#dc2626">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Background Color <span class="label-hint">(optional)</span></label>
+                            <div class="color-input-group">
+                                <input type="color" class="store-background-color-picker" value="#ffffff">
+                                <input type="text" class="store-background-color" placeholder="#ffffff">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Text Color <span class="label-hint">(optional)</span></label>
+                            <div class="color-input-group">
+                                <input type="color" class="store-text-color-picker" value="#000000">
+                                <input type="text" class="store-text-color" placeholder="#000000">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Border Color <span class="label-hint">(optional)</span></label>
+                            <div class="color-input-group">
+                                <input type="color" class="store-border-color-picker" value="#e5e7eb">
+                                <input type="text" class="store-border-color" placeholder="#e5e7eb">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-group-title">Typography</div>
+                    
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Heading Font</label>
+                            <input type="text" class="store-heading-font" list="font-suggestions" placeholder="Montserrat">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Body Font</label>
+                            <input type="text" class="store-body-font" list="font-suggestions" placeholder="Open Sans">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accent Font <span class="label-hint">(optional)</span></label>
+                            <input type="text" class="store-accent-font" list="font-suggestions" placeholder="e.g., for buttons">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-group-title">Apps & Access</div>
+                    
+                    <div class="form-group">
+                        <label>Installed Apps <span class="label-hint">(comma separated)</span></label>
+                        <input type="text" class="store-apps" list="app-suggestions" placeholder="Klaviyo, Yotpo, ReCharge">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Collaborator Code</label>
+                        <input type="text" class="store-collab-code" placeholder="8473">
+                    </div>
+
+                    <div class="row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="store-dev-store">
+                            <label>Development Store</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Access Level</label>
+                            <select class="store-access">
+                                <option value="full">Full Access</option>
+                                <option value="code-only">Code Only</option>
+                                <option value="limited">Limited</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(storeDiv);
+            
+            // Add color picker sync for all color inputs
+            const colorInputs = [
+                { picker: '.store-brand-color-picker', text: '.store-brand-color' },
+                { picker: '.store-accent-color-picker', text: '.store-accent-color' },
+                { picker: '.store-background-color-picker', text: '.store-background-color' },
+                { picker: '.store-text-color-picker', text: '.store-text-color' },
+                { picker: '.store-border-color-picker', text: '.store-border-color' }
+            ];
+
+            colorInputs.forEach(({ picker, text }) => {
+                const pickerEl = storeDiv.querySelector(picker);
+                const textEl = storeDiv.querySelector(text);
+                pickerEl.addEventListener('input', () => textEl.value = pickerEl.value);
+                textEl.addEventListener('input', () => {
+                    if (textEl.value.match(/^#[0-9A-F]{6}$/i)) {
+                        pickerEl.value = textEl.value;
+                    }
+                });
+            });
+        }
+
+        function removeStore(id) {
+            if (document.querySelectorAll('.store-item').length === 1) {
+                alert('You must have at least one store!');
+                return;
+            }
+            const store = document.getElementById(`store-${id}`);
+            if (store && confirm('Remove this store?')) {
+                store.remove();
+            }
+        }
+
+        function duplicateStore(id) {
+            const sourceStore = document.getElementById(`store-${id}`);
+            addStore();
+            
+            const newStore = document.getElementById(`store-${storeCount}`);
+            const fields = [
+                'store-url', 'store-launch-date', 'store-target-market', 'store-product-count', 'store-monthly-traffic',
+                'store-theme-id', 'store-theme-name', 'store-theme-version',
+                'store-brand-color', 'store-accent-color', 'store-background-color', 'store-text-color', 'store-border-color',
+                'store-heading-font', 'store-body-font', 'store-accent-font', 'store-apps'
+            ];
+            
+            fields.forEach(field => {
+                const sourceField = sourceStore.querySelector(`.${field}`);
+                const newField = newStore.querySelector(`.${field}`);
+                if (sourceField && newField) {
+                    newField.value = sourceField.value;
+                }
+            });
+        }
+
+        document.getElementById('clientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateJSON();
+        });
+
+        function generateJSON() {
+            const stores = [];
+            const storeElements = document.querySelectorAll('.store-item');
+
+            storeElements.forEach((storeEl) => {
+                const appsStr = storeEl.querySelector('.store-apps').value;
+                const appsArray = appsStr ? appsStr.split(',').map(s => s.trim()).filter(s => s) : [];
+
+                const fonts = {};
+                const headingFont = storeEl.querySelector('.store-heading-font').value;
+                const bodyFont = storeEl.querySelector('.store-body-font').value;
+                const accentFont = storeEl.querySelector('.store-accent-font').value;
+                
+                if (headingFont) fonts.heading = headingFont;
+                if (bodyFont) fonts.body = bodyFont;
+                if (accentFont) fonts.accent = accentFont;
+
+                const colors = {};
+                const brandColor = storeEl.querySelector('.store-brand-color').value;
+                const accentColor = storeEl.querySelector('.store-accent-color').value;
+                const bgColor = storeEl.querySelector('.store-background-color').value;
+                const textColor = storeEl.querySelector('.store-text-color').value;
+                const borderColor = storeEl.querySelector('.store-border-color').value;
+
+                if (brandColor) colors.brand = brandColor;
+                if (accentColor) colors.accent = accentColor;
+                if (bgColor) colors.background = bgColor;
+                if (textColor) colors.text = textColor;
+                if (borderColor) colors.border = borderColor;
+
+                const storeObj = {
+                    store_url: storeEl.querySelector('.store-url').value,
+                    theme_id: storeEl.querySelector('.store-theme-id').value,
+                    theme_name: storeEl.querySelector('.store-theme-name').value || "",
+                };
+
+                const themeVersion = storeEl.querySelector('.store-theme-version').value;
+                if (themeVersion) storeObj.theme_version = themeVersion;
+
+                const launchDate = storeEl.querySelector('.store-launch-date').value;
+                if (launchDate) storeObj.launch_date = launchDate;
+
+                const targetMarket = storeEl.querySelector('.store-target-market').value;
+                if (targetMarket) storeObj.target_market = targetMarket;
+
+                const productCount = storeEl.querySelector('.store-product-count').value;
+                if (productCount) storeObj.product_count = productCount;
+
+                const monthlyTraffic = storeEl.querySelector('.store-monthly-traffic').value;
+                if (monthlyTraffic) storeObj.monthly_traffic = monthlyTraffic;
+
+                if (Object.keys(colors).length > 0) storeObj.colors = colors;
+                if (Object.keys(fonts).length > 0) storeObj.fonts = fonts;
+                if (appsArray.length > 0) storeObj.apps_installed = appsArray;
+
+                storeObj.access = {
+                    collaborator_code: storeEl.querySelector('.store-collab-code').value || "",
+                    dev_store: storeEl.querySelector('.store-dev-store').checked,
+                    theme_access: storeEl.querySelector('.store-access').value
+                };
+
+                stores.push(storeObj);
+            });
+
+            const clientInfo = {
+                client_name: document.getElementById('clientName').value,
+            };
+
+            const brandName = document.getElementById('brandName').value;
+            if (brandName) clientInfo.brand_name = brandName;
+
+            const fiverOrderId = document.getElementById('fiverOrderId').value;
+            if (fiverOrderId) clientInfo.fiverr_order_id = fiverOrderId;
+
+            const contactEmail = document.getElementById('contactEmail').value;
+            if (contactEmail) clientInfo.contact_email = contactEmail;
+
+            const companyWebsite = document.getElementById('companyWebsite').value;
+            if (companyWebsite) clientInfo.company_website = companyWebsite;
+
+            const industry = document.getElementById('industry').value;
+            if (industry) clientInfo.industry = industry;
+
+            const budget = document.getElementById('budget').value;
+            if (budget) clientInfo.budget = budget;
+
+            clientInfo.timezone = document.getElementById('timezone').value;
+
+            const workingHours = document.getElementById('workingHours').value;
+            if (workingHours) clientInfo.preferred_working_hours = workingHours;
+
+            clientInfo.start_date = document.getElementById('startDate').value;
+            clientInfo.status = document.getElementById('status').value;
+
+            const notes = document.getElementById('notes').value;
+            if (notes) clientInfo.notes = notes;
+
+            // Contact information
+            const contactInfo = {};
+            const whatsapp = document.getElementById('whatsapp').value;
+            const slack = document.getElementById('slack').value;
+            const discord = document.getElementById('discord').value;
+            const phone = document.getElementById('phone').value;
+            const otherContact = document.getElementById('otherContact').value;
+
+            if (whatsapp) contactInfo.whatsapp = whatsapp;
+            if (slack) contactInfo.slack = slack;
+            if (discord) contactInfo.discord = discord;
+            if (phone) contactInfo.phone = phone;
+            if (otherContact) contactInfo.other = otherContact;
+
+            if (Object.keys(contactInfo).length > 0) {
+                clientInfo.contact_information = contactInfo;
+            }
+
+            clientInfo.stores = stores;
+            clientInfo.communication_preferences = {
+                platform: document.getElementById('platform').value,
+                response_time: document.getElementById('responseTime').value,
+                prefers_videos: document.getElementById('prefersVideos').checked
+            };
+
+            const jsonStr = JSON.stringify(clientInfo, null, 2);
+            document.getElementById('jsonOutput').textContent = jsonStr;
+            document.getElementById('outputSection').classList.add('show');
+            document.getElementById('successMessage').classList.add('show');
+
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('show');
+            }, 3000);
+        }
+
+        function copyToClipboard() {
+            const jsonText = document.getElementById('jsonOutput').textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                const text = document.getElementById('copyText');
+                text.textContent = 'Copied!';
+                setTimeout(() => {
+                    text.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function downloadJSON() {
+            const jsonText = document.getElementById('jsonOutput').textContent;
+            const clientName = document.getElementById('clientName').value || 'client';
+            const filename = `${clientName.toLowerCase().replace(/\s+/g, '-')}.client-info.json`;
+            
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearForm() {
+            if (confirm('Clear all form data? This cannot be undone.')) {
+                document.getElementById('clientForm').reset();
+                document.getElementById('storesContainer').innerHTML = '';
+                storeCount = 0;
+                addStore();
+                localStorage.removeItem('clientFormData');
+                document.getElementById('outputSection').classList.remove('show');
+            }
+        }
+
+        function exportData() {
+            const formData = {
+                clientName: document.getElementById('clientName').value,
+                brandName: document.getElementById('brandName').value,
+                fiverOrderId: document.getElementById('fiverOrderId').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                companyWebsite: document.getElementById('companyWebsite').value,
+                industry: document.getElementById('industry').value,
+                timezone: document.getElementById('timezone').value,
+                workingHours: document.getElementById('workingHours').value,
+                startDate: document.getElementById('startDate').value,
+                status: document.getElementById('status').value,
+                budget: document.getElementById('budget').value,
+                notes: document.getElementById('notes').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                slack: document.getElementById('slack').value,
+                discord: document.getElementById('discord').value,
+                phone: document.getElementById('phone').value,
+                otherContact: document.getElementById('otherContact').value,
+                platform: document.getElementById('platform').value,
+                responseTime: document.getElementById('responseTime').value,
+                prefersVideos: document.getElementById('prefersVideos').checked,
+                stores: getStoresData()
+            };
+            
+            const blob = new Blob([JSON.stringify(formData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'client-info-progress.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            document.getElementById('progressInput').click();
+        }
+
+        function handleProgressImport(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        document.getElementById('clientName').value = data.clientName || '';
+                        document.getElementById('brandName').value = data.brandName || '';
+                        document.getElementById('fiverOrderId').value = data.fiverOrderId || '';
+                        document.getElementById('contactEmail').value = data.contactEmail || '';
+                        document.getElementById('companyWebsite').value = data.companyWebsite || '';
+                        document.getElementById('industry').value = data.industry || '';
+                        document.getElementById('timezone').value = data.timezone || 'EST';
+                        document.getElementById('workingHours').value = data.workingHours || '';
+                        document.getElementById('startDate').value = data.startDate || '';
+                        document.getElementById('status').value = data.status || 'active';
+                        document.getElementById('budget').value = data.budget || '';
+                        document.getElementById('notes').value = data.notes || '';
+                        document.getElementById('whatsapp').value = data.whatsapp || '';
+                        document.getElementById('slack').value = data.slack || '';
+                        document.getElementById('discord').value = data.discord || '';
+                        document.getElementById('phone').value = data.phone || '';
+                        document.getElementById('otherContact').value = data.otherContact || '';
+                        document.getElementById('platform').value = data.platform || 'fiverr';
+                        document.getElementById('responseTime').value = data.responseTime || 'within 12 hours';
+                        document.getElementById('prefersVideos').checked = data.prefersVideos !== false;
+                        
+                        // Clear and reload stores
+                        document.getElementById('storesContainer').innerHTML = '';
+                        storeCount = 0;
+                        
+                        if (data.stores && data.stores.length > 0) {
+                            data.stores.forEach((store) => {
+                                addStore();
+                                populateStore(storeCount, store);
+                            });
+                        } else {
+                            addStore();
+                        }
+                        
+                        alert('Progress imported successfully!');
+                    } catch (err) {
+                        alert('Error importing file: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function loadFromFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const clientInfo = JSON.parse(e.target.result);
+                        
+                        document.getElementById('clientName').value = clientInfo.client_name || '';
+                        document.getElementById('brandName').value = clientInfo.brand_name || '';
+                        document.getElementById('fiverOrderId').value = clientInfo.fiverr_order_id || '';
+                        document.getElementById('contactEmail').value = clientInfo.contact_email || '';
+                        document.getElementById('companyWebsite').value = clientInfo.company_website || '';
+                        document.getElementById('industry').value = clientInfo.industry || '';
+                        document.getElementById('timezone').value = clientInfo.timezone || 'EST';
+                        document.getElementById('workingHours').value = clientInfo.preferred_working_hours || '';
+                        document.getElementById('startDate').value = clientInfo.start_date || '';
+                        document.getElementById('status').value = clientInfo.status || 'active';
+                        document.getElementById('budget').value = clientInfo.budget || '';
+                        document.getElementById('notes').value = clientInfo.notes || '';
+                        
+                        // Load contact information
+                        if (clientInfo.contact_information) {
+                            document.getElementById('whatsapp').value = clientInfo.contact_information.whatsapp || '';
+                            document.getElementById('slack').value = clientInfo.contact_information.slack || '';
+                            document.getElementById('discord').value = clientInfo.contact_information.discord || '';
+                            document.getElementById('phone').value = clientInfo.contact_information.phone || '';
+                            document.getElementById('otherContact').value = clientInfo.contact_information.other || '';
+                        }
+
+                        if (clientInfo.communication_preferences) {
+                            document.getElementById('platform').value = clientInfo.communication_preferences.platform || 'fiverr';
+                            document.getElementById('responseTime').value = clientInfo.communication_preferences.response_time || 'within 12 hours';
+                            document.getElementById('prefersVideos').checked = clientInfo.communication_preferences.prefers_videos !== false;
+                        }
+                        
+                        // Clear and reload stores
+                        document.getElementById('storesContainer').innerHTML = '';
+                        storeCount = 0;
+                        
+                        if (clientInfo.stores && clientInfo.stores.length > 0) {
+                            clientInfo.stores.forEach((store) => {
+                                addStore();
+                                const storeEl = document.getElementById(`store-${storeCount}`);
+                                
+                                storeEl.querySelector('.store-url').value = store.store_url || '';
+                                storeEl.querySelector('.store-launch-date').value = store.launch_date || '';
+                                storeEl.querySelector('.store-target-market').value = store.target_market || '';
+                                storeEl.querySelector('.store-product-count').value = store.product_count || '';
+                                storeEl.querySelector('.store-monthly-traffic').value = store.monthly_traffic || '';
+                                storeEl.querySelector('.store-theme-id').value = store.theme_id || '';
+                                storeEl.querySelector('.store-theme-name').value = store.theme_name || '';
+                                storeEl.querySelector('.store-theme-version').value = store.theme_version || '';
+                                
+                                if (store.colors) {
+                                    storeEl.querySelector('.store-brand-color').value = store.colors.brand || '';
+                                    storeEl.querySelector('.store-accent-color').value = store.colors.accent || '';
+                                    storeEl.querySelector('.store-background-color').value = store.colors.background || '';
+                                    storeEl.querySelector('.store-text-color').value = store.colors.text || '';
+                                    storeEl.querySelector('.store-border-color').value = store.colors.border || '';
+                                }
+                                
+                                if (store.fonts) {
+                                    storeEl.querySelector('.store-heading-font').value = store.fonts.heading || '';
+                                    storeEl.querySelector('.store-body-font').value = store.fonts.body || '';
+                                    storeEl.querySelector('.store-accent-font').value = store.fonts.accent || '';
+                                }
+                                
+                                if (store.apps_installed) {
+                                    storeEl.querySelector('.store-apps').value = store.apps_installed.join(', ');
+                                }
+                                
+                                if (store.access) {
+                                    storeEl.querySelector('.store-collab-code').value = store.access.collaborator_code || '';
+                                    storeEl.querySelector('.store-dev-store').checked = store.access.dev_store || false;
+                                    storeEl.querySelector('.store-access').value = store.access.theme_access || 'full';
+                                }
+                            });
+                        } else {
+                            addStore();
+                        }
+                        
+                        alert('Client info loaded successfully!');
+                    } catch (err) {
+                        alert('Error reading file: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function showTemplates() {
+            const modal = document.getElementById('templatesModal');
+            const list = document.getElementById('templatesList');
+            
+            list.innerHTML = templates.map((template, index) => `
+                <div class="template-item" onclick="applyTemplate(${index})">
+                    <div class="template-name">${template.name}</div>
+                    <div class="template-desc">${template.description}</div>
+                </div>
+            `).join('');
+            
+            modal.classList.add('show');
+        }
+
+        function hideTemplates() {
+            document.getElementById('templatesModal').classList.remove('show');
+        }
+
+        function applyTemplate(index) {
+            const template = templates[index];
+            const stores = document.querySelectorAll('.store-item');
+            
+            if (stores.length > 0) {
+                const firstStore = stores[0];
+                firstStore.querySelector('.store-apps').value = template.data.apps;
+                firstStore.querySelector('.store-brand-color').value = template.data.colors.brand;
+                firstStore.querySelector('.store-accent-color').value = template.data.colors.accent;
+                firstStore.querySelector('.store-background-color').value = template.data.colors.background;
+                firstStore.querySelector('.store-text-color').value = template.data.colors.text;
+                firstStore.querySelector('.store-heading-font').value = template.data.fonts.heading;
+                firstStore.querySelector('.store-body-font').value = template.data.fonts.body;
+                if (template.data.fonts.accent) {
+                    firstStore.querySelector('.store-accent-font').value = template.data.fonts.accent;
+                }
+            }
+            
+            hideTemplates();
+        }
+
+        // Add datalist for fonts and apps
+        const fontDatalist = document.createElement('datalist');
+        fontDatalist.id = 'font-suggestions';
+        fontDatalist.innerHTML = commonFonts.map(font => `<option value="${font}">`).join('');
+        document.body.appendChild(fontDatalist);
+
+        const appDatalist = document.createElement('datalist');
+        appDatalist.id = 'app-suggestions';
+        appDatalist.innerHTML = commonApps.map(app => `<option value="${app}">`).join('');
+        document.body.appendChild(appDatalist);
+
+        // Close modal when clicking outside
+        document.getElementById('templatesModal').addEventListener('click', (e) => {
+            if (e.target.id === 'templatesModal') {
+                hideTemplates();
+            }
+        });
+    </script>
+</body>
+</html>
